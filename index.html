@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Korpri Maju Terus</title>
     <style>
+	
+		/* --- CSS SUMMARY BULANAN --- */
+.summary-container {
+    margin-bottom: 2rem;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.summary-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--primary);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.summary-period {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+}
+.summary-label { color: var(--text-muted); }
+.summary-value { font-weight: 600; }
+.summary-value.bayar { color: #166534; }
+.summary-value.bruto { color: #b45309; }
         /* --- CSS VARIABLES & RESET --- */
         :root {
             --primary: #2563eb;
@@ -40,7 +82,7 @@
         .card h4 { color: var(--primary); margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
         .card h4:first-child { margin-top: 0; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted); }
         input, select, textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; transition: border-color 0.2s; }
@@ -215,12 +257,57 @@
             body.mode-print-report @page { size: A4 portrait; margin: 10mm; }
             body.mode-print-receipt @page { size: 215mm 110mm; margin: 0; }
         }
+		/* --- CSS PAGINATION --- */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    min-width: 35px;
+    height: 35px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: var(--bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.pagination-btn.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: bold;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f1f5f9;
+}
+		
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Aplikasi Iuran Korpri v.1.0</h1>
+        <h1>Aplikasi Iuran Korpri v.1.1</h1>
         <nav>
             <button id="nav-input" class="active" onclick="switchTab('input')">Input Data</button>
             <button id="nav-report" onclick="switchTab('report')">Laporan Data</button>
@@ -283,6 +370,28 @@
                         <small style="color: var(--text-muted)">Isi angka untuk memaksa mulai dari urutan tertentu. Kosongkan untuk lanjut otomatis.</small>
                     </div>
                 </div>
+
+                <!-- PENGATURAN NOMINAL STANDAR (BARU) -->
+                <h4>Standar Nominal Golongan (Otomatis)</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nominal Gol 1</label>
+                        <input type="number" id="std-gol-1" placeholder="0" onchange="saveSettings()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Nominal Gol 2</label>
+                        <input type="number" id="std-gol-2" placeholder="0" onchange="saveSettings()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Nominal Gol 3</label>
+                        <input type="number" id="std-gol-3" placeholder="0" onchange="saveSettings()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Nominal Gol 4</label>
+                        <input type="number" id="std-gol-4" placeholder="0" onchange="saveSettings()" min="0">
+                    </div>
+                </div>
+                <small style="color: var(--text-muted)">Nilai nominal di atas akan otomatis terisi saat memilih Golongan di form input.</small>
             </div>
 
             <!-- FORM INPUT -->
@@ -331,11 +440,11 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Tahun</label>
-                            <select id="periode-tahun" required>
-                                <!-- Diisi via JS -->
-                            </select>
-                        </div>
+							<label>Tahun</label>
+							<select id="periode-tahun" required>
+								<!-- Opsi akan diisi oleh Javascript -->
+							</select>
+						</div>
 
                         <!-- INPUTAN RINCIAN GOLONGAN -->
                         <div class="form-group" style="grid-column: 1 / -1;">
@@ -344,51 +453,39 @@
                                 <div class="rincian-header">
                                     <div class="rincian-label">Gol.</div>
                                     <div class="rincian-label">Jml Org</div>
-                                    <div class="rincian-label">Nominal/Orang</div>
+                                    <div class="rincian-label">Nominal/Orang (Auto)</div>
                                 </div>
                                 <!-- Baris 1 -->
                                 <div class="rincian-row">
-                                    <select class="input-golongan">
+                                    <select class="input-golongan" onchange="updateNominalFromSettings(this)">
                                         <option value="1">Gol 1</option>
-                                        <!--<option value="2">Gol 2</option>-->
-                                        <!--<option value="3">Gol 3</option>-->
-                                        <!--<option value="4">Gol 4</option>-->
                                     </select>
                                     <input type="number" class="input-jumlah" placeholder="0" min="0" oninput="calculateTotal()">
-                                    <input type="number" class="input-nominal" placeholder="wajib diisi nominal per golongan" min="0" oninput="calculateTotal()">
+                                    <input type="number" class="input-nominal" placeholder="Auto" min="0" oninput="calculateTotal()">
                                 </div>
                                 <!-- Baris 2 -->
                                 <div class="rincian-row">
-                                    <select class="input-golongan">
+                                    <select class="input-golongan" onchange="updateNominalFromSettings(this)">
                                         <option value="2">Gol 2</option>
-                                        <!--<option value="1">Gol 1</option>-->
-                                        <!--<option value="3">Gol 3</option>-->
-                                        <!--<option value="4">Gol 4</option>-->
                                     </select>
                                     <input type="number" class="input-jumlah" placeholder="0" min="0" oninput="calculateTotal()">
-                                    <input type="number" class="input-nominal" placeholder="wajib diisi nominal per golongan" min="0" oninput="calculateTotal()">
+                                    <input type="number" class="input-nominal" placeholder="Auto" min="0" oninput="calculateTotal()">
                                 </div>
                                 <!-- Baris 3 -->
                                 <div class="rincian-row">
-                                    <select class="input-golongan">
+                                    <select class="input-golongan" onchange="updateNominalFromSettings(this)">
                                         <option value="3">Gol 3</option>
-                                        <!--<option value="1">Gol 1</option>-->
-                                        <!--<option value="2">Gol 2</option>-->
-                                        <!--<option value="4">Gol 4</option>-->
                                     </select>
                                     <input type="number" class="input-jumlah" placeholder="0" min="0" oninput="calculateTotal()">
-                                    <input type="number" class="input-nominal" placeholder="wajib diisi nominal per golongan" min="0" oninput="calculateTotal()">
+                                    <input type="number" class="input-nominal" placeholder="Auto" min="0" oninput="calculateTotal()">
                                 </div>
                                 <!-- Baris 4 -->
                                 <div class="rincian-row">
-                                    <select class="input-golongan">
+                                    <select class="input-golongan" onchange="updateNominalFromSettings(this)">
                                         <option value="4">Gol 4</option>
-                                        <!--<option value="1">Gol 1</option>-->
-                                        <!--<option value="2">Gol 2</option>-->
-                                        <!--<option value="3">Gol 3</option>-->
                                     </select>
                                     <input type="number" class="input-jumlah" placeholder="0" min="0" oninput="calculateTotal()">
-                                    <input type="number" class="input-nominal" placeholder="wajib diisi nominal per golongan" min="0" oninput="calculateTotal()">
+                                    <input type="number" class="input-nominal" placeholder="Auto" min="0" oninput="calculateTotal()">
                                 </div>
                             </div>
                         </div>
@@ -441,19 +538,75 @@
         <!-- HALAMAN LAPORAN -->
         <section id="report-section" class="section-view">
             <div class="card">
+		<div class="summary-container">
+    <!-- HEADER & FILTER GROUP -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 15px;">
+        <h4 style="color: var(--primary-dark); margin:0;">Ringkasan Setoran</h4>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            
+            <!-- FILTER TAHUN -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <label style="margin:0; font-size: 0.85rem; font-weight:600;">Tahun:</label>
+                <select id="filter-summary-year" onchange="renderMonthlySummary()" style="padding: 0.4rem; border-radius: 4px; border: 1px solid var(--border);">
+                    <option value="ALL">Semua</option>
+                </select>
+            </div>
+
+            <!-- FILTER BULAN -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <label style="margin:0; font-size: 0.85rem; font-weight:600;">Bulan:</label>
+                <select id="filter-summary-month" onchange="renderMonthlySummary()" style="padding: 0.4rem; border-radius: 4px; border: 1px solid var(--border);">
+                    <option value="ALL">Semua</option>
+                </select>
+            </div>
+
+            <!-- FILTER PENERIMA -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <label style="margin:0; font-size: 0.85rem; font-weight:600;">Penerima:</label>
+                <select id="filter-summary-receiver" onchange="renderMonthlySummary()" style="padding: 0.4rem; border-radius: 4px; border: 1px solid var(--border); min-width: 150px;">
+                    <option value="ALL">Semua</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- GRID RINGKASAN -->
+    <div id="monthly-summary-grid" class="summary-grid">
+        <div style="padding: 1rem; color: var(--text-muted); font-style: italic;">Memuat ringkasan...</div>
+    </div>
+</div>
+
+    <!-- Grid Ringkasan -->
+    <div id="monthly-summary-grid" class="summary-grid">
+        <div style="padding: 1rem; color: var(--text-muted); font-style: italic;">Memuat ringkasan...</div>
+    </div>
+</div>
+        <!-- -------------------------------- -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
-                    <h3>Laporan Data Setoran</h3>
-                    <div class="action-buttons">
-                        <button onclick="exportToExcel()" class="btn btn-excel">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            Ekspor Excel
-                        </button>
-                        <button onclick="printReportTable()" class="btn btn-outline">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                            Cetak Laporan
-                        </button>
-                    </div>
-                </div>
+					<h3>Laporan Data Setoran</h3>
+					<div class="action-buttons">
+						
+						<!-- INPUT FILE IMPORT (Disembunyikan, dipicu oleh tombol) -->
+						<input type="file" id="import-file" accept=".xls,.xlsx" hidden onchange="handleImport(this)">
+						
+						<button onclick="document.getElementById('import-file').click()" class="btn btn-primary">
+							<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"/></svg>
+							Import Data Excel
+						</button>
+
+						<button onclick="exportToExcel()" class="btn btn-excel">
+							<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+							Ekspor Excel
+						</button>
+						
+						<button onclick="printReportTable()" class="btn btn-outline">
+							<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+							Cetak Laporan
+						</button>
+					</div>
+				</div>
 
                 <div class="table-responsive">
                     <table id="report-table">
@@ -477,6 +630,7 @@
                             </tr>
                         </tbody>
                     </table>
+					<div id="pagination-controls" class="pagination-container"></div>
                 </div>
             </div>
         </section>
@@ -501,14 +655,19 @@
 
     <script>
         // --- STATE MANAGEMENT ---
-        let db = JSON.parse(localStorage.getItem('kwitansiData')) || [];
+        // --- STATE MANAGEMENT PAGINATION ---
+		let currentPage = 1;
+		const rowsPerPage = 10; // Jumlah data per halaman
+		let db = JSON.parse(localStorage.getItem('kwitansiData')) || [];
         let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
             logo: null,
             instansi: 'ISI NAMA ORGANISASI',
             alamat: 'ISI ALAMAT',
             numberSuffix: '/KORP/BKL',
             numberSeparator: '/',
-            counterManual: '' 
+            counterManual: '',
+            // Default nilai standar (jika belum ada di localStorage)
+            golonganNominal: { '1': '', '2': '', '3': '', '4': '' } 
         };
 
         let currentEditId = null; 
@@ -525,18 +684,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadSettings();
             initDateFields();
+            // Set initial nominal value for rows based on default selection
+            document.querySelectorAll('.input-golongan').forEach(select => {
+                updateNominalFromSettings(select);
+            });
             generateNextNumber();
             renderReportTable();
         });
 
         // --- NAVIGATION ---
         function switchTab(tabName) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`nav-${tabName}`).classList.add('active');
-            document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-            document.getElementById(`${tabName}-section`).classList.add('active');
-            if (tabName === 'report') renderReportTable();
-        }
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`nav-${tabName}`).classList.add('active');
+    document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+    document.getElementById(`${tabName}-section`).classList.add('active');
+    
+    if (tabName === 'report') {
+        initReportFilters(); // Panggil ini untuk mengisi dropdown
+        renderReportTable(); 
+    }
+}
 
         // --- SETTINGS & LOGO ---
         function loadSettings() {
@@ -545,6 +712,12 @@
             document.getElementById('setting-suffix').value = appSettings.numberSuffix;
             document.getElementById('setting-separator').value = appSettings.numberSeparator;
             document.getElementById('setting-counter-manual').value = appSettings.counterManual;
+
+            // Load Standar Nominal
+            document.getElementById('std-gol-1').value = appSettings.golonganNominal['1'] || '';
+            document.getElementById('std-gol-2').value = appSettings.golonganNominal['2'] || '';
+            document.getElementById('std-gol-3').value = appSettings.golonganNominal['3'] || '';
+            document.getElementById('std-gol-4').value = appSettings.golonganNominal['4'] || '';
 
             if (appSettings.logo) {
                 const prev = document.getElementById('logo-preview');
@@ -560,6 +733,12 @@
             appSettings.numberSuffix = document.getElementById('setting-suffix').value;
             appSettings.numberSeparator = document.getElementById('setting-separator').value;
             appSettings.counterManual = document.getElementById('setting-counter-manual').value;
+            
+            // Simpan Standar Nominal
+            appSettings.golonganNominal['1'] = document.getElementById('std-gol-1').value;
+            appSettings.golonganNominal['2'] = document.getElementById('std-gol-2').value;
+            appSettings.golonganNominal['3'] = document.getElementById('std-gol-3').value;
+            appSettings.golonganNominal['4'] = document.getElementById('std-gol-4').value;
             
             localStorage.setItem('appSettings', JSON.stringify(appSettings));
             generateNextNumber();
@@ -579,20 +758,48 @@
             }
         }
 
+        // --- LOGIKA AUTO FILL NOMINAL ---
+        function updateNominalFromSettings(selectElement) {
+            const gol = selectElement.value; // ambil nilai 1, 2, 3, atau 4
+            const row = selectElement.closest('.rincian-row');
+            const nominalInput = row.querySelector('.input-nominal');
+            
+            // Ambil nilai dari settings (gunakan 0 jika kosong agar tidak NaN)
+            const standardNominal = appSettings.golonganNominal[gol] || 0;
+            
+            // Isi input
+            nominalInput.value = standardNominal;
+            
+            // Hitung ulang total
+            calculateTotal();
+        }
+
         // --- FORM HELPERS ---
         function initDateFields() {
-            document.getElementById('tgl-cetak').valueAsDate = new Date();
-            document.getElementById('tgl-setor').valueAsDate = new Date();
-            const yearSelect = document.getElementById('periode-tahun');
-            const currentYear = new Date().getFullYear();
-            for (let i = currentYear - 2; i <= currentYear + 5; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.text = i;
-                if (i === currentYear) opt.selected = true;
-                yearSelect.appendChild(opt);
-            }
-        }
+			// Set Tanggal Hari Ini
+			document.getElementById('tgl-cetak').valueAsDate = new Date();
+			document.getElementById('tgl-setor').valueAsDate = new Date();
+			
+			// Set Dropdown Tahun
+			const yearSelect = document.getElementById('periode-tahun');
+			
+			// Pastikan elemen ditemukan
+			if (yearSelect) {
+				yearSelect.innerHTML = ""; // Bersihkan opsi lama
+				
+				const currentYear = new Date().getFullYear();
+				const startYear = 2020; // Mulai dari 2020 (bisa diubah sesuai kebutuhan)
+				const endYear = 2031;   // Batas akhir tahun sesuai permintaan
+				
+				for (let i = startYear; i <= endYear; i++) {
+					const opt = document.createElement('option');
+					opt.value = i;
+					opt.text = i;
+					if (i === currentYear) opt.selected = true; // Otomatis pilih tahun sekarang
+					yearSelect.appendChild(opt);
+				}
+			}
+		}
 
         function formatCurrencyInput(input) {
             // Helper kosong
@@ -648,11 +855,14 @@
             document.getElementById('btn-submit').classList.remove('btn-warning');
             document.getElementById('btn-submit').classList.add('btn-primary');
 
+            // Reset rincian inputs
             const selects = document.querySelectorAll('.input-golongan');
             selects.forEach((s, index) => {
-                s.selectedIndex = index; 
+                s.selectedIndex = 0; // Reset ke pilihan pertama
+                // Trigger auto fill ulang
+                updateNominalFromSettings(s);
             });
-            document.querySelectorAll('.input-jumlah, .input-nominal').forEach(i => i.value = '');
+            
             document.getElementById('nominal').value = '';
             document.getElementById('total-bayar').value = '';
         }
@@ -857,102 +1067,408 @@
                 showToast("Data dihapus", "success");
             }
         }
+		function initReportFilters() {
+    // Ambil elemen select
+    const yearSelect = document.getElementById('filter-summary-year');
+    const monthSelect = document.getElementById('filter-summary-month');
+    const receiverSelect = document.getElementById('filter-summary-receiver');
 
-        // --- REPORTING ---
-        function renderReportTable() {
-            const tbody = document.querySelector('#report-table tbody');
-            tbody.innerHTML = '';
-            if (db.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 2rem; color: #64748b;">Belum ada data kwitansi.</td></tr>`;
-                return;
-            }
-            const sortedDb = [...db].sort((a, b) => b.id - a.id);
-            sortedDb.forEach(item => {
-                const tr = document.createElement('tr');
-                const formattedNominal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal);
-                const formattedBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.totalBayar);
-                
-                tr.innerHTML = `
-                    <td><span style="font-family: monospace; font-weight: bold;">${item.noKwitansi}</span></td>
-                    <td>${item.bulan} ${item.tahun}</td>
-                    <td>${formatDateIndo(item.tglCetak)}</td>
-                    <td><span style="color: var(--primary); font-weight: bold;">${formatDateIndo(item.tglSetor)}</span></td>
-                    <td>${item.namaPenyetor}</td>
-                    <td>${item.penerima}</td>
-                    <td>${item.opd}</td>
-                    <td>${formattedNominal}</td>
-                    <td style="font-weight:bold; color: var(--primary-dark);">${formattedBayar}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button onclick="openEditMode(${item.id})" class="btn btn-warning" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Edit</button>
-                            <button onclick="showReceiptPreviewById(${item.id})" class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Preview</button>
-                            <button onclick="deleteData(${item.id})" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Hapus</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+    // Pengecekan keamanan: Jika elemen tidak ditemukan, stop.
+    if (!yearSelect || !monthSelect || !receiverSelect) {
+        console.error("ID Filter tidak ditemukan di HTML! Cek kembali penggantian HTML.");
+        return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const monthsList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+    // --- 1. ISI FILTER TAHUN ---
+    let existingYears = new Set();
+    existingYears.add(currentYear); // Selalu sertakan tahun sekarang
+    
+    // Ambil tahun dari database
+    if (db && Array.isArray(db)) {
+        db.forEach(item => {
+            if (item.tahun) existingYears.add(parseInt(item.tahun));
+        });
+    }
+
+    const yearsArray = Array.from(existingYears).sort((a, b) => b - a);
+    const savedYear = yearSelect.value;
+    
+    // Reset isi dropdown tahun
+    yearSelect.innerHTML = '<option value="ALL">Semua</option>';
+    yearsArray.forEach(year => {
+        const opt = document.createElement('option');
+        opt.value = year; 
+        opt.text = year;
+        yearSelect.appendChild(opt);
+    });
+    // Kembalikan pilihan user jika masih ada, else 'ALL'
+    if (yearsArray.includes(parseInt(savedYear))) {
+        yearSelect.value = savedYear;
+    } else {
+        yearSelect.value = 'ALL';
+    }
+
+    // --- 2. ISI FILTER BULAN ---
+    const savedMonth = monthSelect.value;
+    monthSelect.innerHTML = '<option value="ALL">Semua</option>';
+    monthsList.forEach(month => {
+        const opt = document.createElement('option');
+        opt.value = month; 
+        opt.text = month;
+        monthSelect.appendChild(opt);
+    });
+    // Set ke bulan sekarang atau pilihan lama
+    const currentMonthName = monthsList[new Date().getMonth()];
+    if (savedMonth && savedMonth !== 'ALL') {
+        monthSelect.value = savedMonth;
+    } else {
+        monthSelect.value = 'ALL'; 
+    }
+
+    // --- 3. ISI FILTER PENERIMA ---
+    let existingReceivers = new Set();
+    if (db && Array.isArray(db)) {
+        db.forEach(item => {
+            if (item.penerima) existingReceivers.add(item.penerima);
+        });
+    }
+
+    // Urutkan nama penerima A-Z
+    const receiversArray = Array.from(existingReceivers).sort();
+    
+    const savedReceiver = receiverSelect.value;
+    receiverSelect.innerHTML = '<option value="ALL">Semua</option>';
+    receiversArray.forEach(receiver => {
+        const opt = document.createElement('option');
+        opt.value = receiver; 
+        opt.text = receiver;
+        receiverSelect.appendChild(opt);
+    });
+    if (savedReceiver && receiversArray.includes(savedReceiver)) {
+        receiverSelect.value = savedReceiver;
+    }
+}
+		// --- FUNGSI BARU: RENDER RINGKASAN BULANAN ---
+function renderMonthlySummary() {
+    const container = document.getElementById('monthly-summary-grid');
+    container.innerHTML = '';
+
+    if (db.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada data untuk diringkas.</div>';
+        return;
+    }
+
+    // --- 1. AMBIL NILAI FILTER ---
+    const filterYear = document.getElementById('filter-summary-year').value;
+    const filterMonth = document.getElementById('filter-summary-month').value;
+    const filterReceiver = document.getElementById('filter-summary-receiver').value;
+
+    // --- 2. FILTER DATA RAW (Proses Filter Pertama) ---
+    const filteredData = db.filter(item => {
+        let matchYear = (filterYear === 'ALL') || (item.tahun == filterYear);
+        let matchMonth = (filterMonth === 'ALL') || (item.bulan == filterMonth);
+        let matchReceiver = (filterReceiver === 'ALL') || (item.penerima == filterReceiver);
+        return matchYear && matchMonth && matchReceiver;
+    });
+
+    if (filteredData.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Tidak ada data yang cocok dengan filter yang dipilih.</div>`;
+        return;
+    }
+
+    // --- 3. GROUPING DATA (Proses Kelompokan) ---
+    const groupedData = {};
+    filteredData.forEach(item => {
+        // Gunakan periode Bulan Tahun sebagai Key
+        const periodKey = `${item.bulan} ${item.tahun}`;
+        if (!groupedData[periodKey]) {
+            groupedData[periodKey] = { bruto: 0, bayar: 0, count: 0 };
         }
+        groupedData[periodKey].bruto += parseFloat(item.nominal);
+        groupedData[periodKey].bayar += parseFloat(item.totalBayar);
+        groupedData[periodKey].count += 1;
+    });
+
+    const periods = Object.keys(groupedData);
+    const monthOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    
+    // Sort Periode (Terbaru di atas)
+    periods.sort((a, b) => {
+        const [monthA, yearA] = a.split(' ');
+        const [monthB, yearB] = b.split(' ');
+        if (yearA !== yearB) return parseInt(yearB) - parseInt(yearA);
+        return monthOrder.indexOf(monthB) - monthOrder.indexOf(monthA);
+    });
+
+    // --- 4. RENDER KARTU ---
+    let html = '';
+    periods.forEach(period => {
+        const data = groupedData[period];
+        const fmtBruto = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.bruto);
+        const fmtBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.bayar);
+        
+        html += `
+            <div class="summary-card">
+                <span class="summary-period">${period}</span>
+                <div class="summary-row">
+                    <span class="summary-label">Jml Data:</span>
+                    <span class="summary-value">${data.count} Kwitansi</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total Bruto:</span>
+                    <span class="summary-value bruto">${fmtBruto}</span>
+                </div>
+                <div style="border-top: 1px dashed #ccc; margin: 5px 0;"></div>
+                <div class="summary-row">
+                    <span class="summary-label">Total Bayar (50%):</span>
+                    <span class="summary-value bayar">${fmtBayar}</span>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// --- UPDATE FUNGSI renderReportTable ---
+	function renderReportTable() {
+    const tbody = document.querySelector('#report-table tbody');
+    tbody.innerHTML = '';
+    
+    if (db.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 2rem; color: #64748b;">Belum ada data kwitansi.</td></tr>`;
+        renderMonthlySummary();
+        document.getElementById('pagination-controls').innerHTML = ''; // Sembunyikan pagination jika kosong
+        return;
+    }
+    
+    renderMonthlySummary();
+
+    // 1. Urutkan Data (Terbaru dulu)
+    const sortedDb = [...db].sort((a, b) => b.id - a.id);
+    
+    // 2. Hitung Total Halaman
+    const totalPages = Math.ceil(sortedDb.length / rowsPerPage);
+    
+    // 3. Cek apakah currentPage valid (misal: setelah hapus data, halaman jadi kosong)
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+
+    // 4. Ambil data untuk halaman saat ini
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedItems = sortedDb.slice(startIndex, endIndex);
+
+    // 5. Render Baris Tabel
+    paginatedItems.forEach(item => {
+        const tr = document.createElement('tr');
+        const formattedNominal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal);
+        const formattedBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.totalBayar);
+        
+        tr.innerHTML = `
+            <td><span style="font-family: monospace; font-weight: bold;">${item.noKwitansi}</span></td>
+            <td>${item.bulan} ${item.tahun}</td>
+            <td>${formatDateIndo(item.tglCetak)}</td>
+            <td><span style="color: var(--primary); font-weight: bold;">${formatDateIndo(item.tglSetor)}</span></td>
+            <td>${item.namaPenyetor}</td>
+            <td>${item.penerima}</td>
+            <td>${item.opd}</td>
+            <td>${formattedNominal}</td>
+            <td style="font-weight:bold; color: var(--primary-dark);">${formattedBayar}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="openEditMode(${item.id})" class="btn btn-warning" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Edit</button>
+                    <button onclick="showReceiptPreviewById(${item.id})" class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Preview</button>
+                    <button onclick="deleteData(${item.id})" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Hapus</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // 6. Render Tombol Pagination
+    renderPaginationControls(totalPages);
+}
+	function renderPaginationControls(totalPages) {
+    const container = document.getElementById('pagination-controls');
+    container.innerHTML = '';
+
+    if (totalPages <= 1) return; // Tidak perlu pagination jika data cuma 1 halaman
+
+    // Tombol Previous
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.innerText = '<';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => changePage(currentPage - 1);
+    container.appendChild(prevBtn);
+
+    // Tombol Angka Halaman
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+        btn.innerText = i;
+        btn.onclick = () => changePage(i);
+        container.appendChild(btn);
+    }
+
+    // Tombol Next
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.innerText = '>';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => changePage(currentPage + 1);
+    container.appendChild(nextBtn);
+}
+
+// Fungsi Helper untuk Ganti Halaman
+function changePage(page) {
+    currentPage = page;
+    renderReportTable();
+    // Scroll sedikit ke atas tabel agar user sadar halaman berubah
+    document.querySelector('#report-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+        function handleImport(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        
+        // Gunakan Dummy Div untuk parsing HTML tabel
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const rows = doc.querySelectorAll('table tr');
+
+        let importedCount = 0;
+        let errorCount = 0;
+
+        // Loop dimulai dari index 1 karena index 0 adalah header
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            // Cari kolom terakhir yang menyimpan data JSON (Class: hidden-raw-data)
+            const hiddenCell = row.querySelector('.hidden-raw-data');
+
+            if (hiddenCell) {
+                try {
+                    // Decode dan Parse JSON
+                    const jsonString = decodeURIComponent(hiddenCell.innerText);
+                    const dataObj = JSON.parse(jsonString);
+
+                    // Opsional: Cek duplikasi berdasarkan ID
+                    const exists = db.find(d => d.id === dataObj.id);
+                    if (!exists) {
+                        db.push(dataObj);
+                        importedCount++;
+                    } else {
+                        // Jika ID sudah ada, kita skip atau update?
+                        // Di sini kita skip (hanya tambah data baru)
+                        // console.log("Data ID sudah ada: " + dataObj.id);
+                        errorCount++;
+                    }
+                } catch (err) {
+                    console.error("Gagal parsing baris " + i, err);
+                    errorCount++;
+                }
+            }
+        }
+
+        if (importedCount > 0) {
+            // Simpan ke LocalStorage
+            localStorage.setItem('kwitansiData', JSON.stringify(db));
+            renderReportTable();
+            initReportFilters(); // Refresh filter
+            
+            let msg = `Berhasil mengimpor ${importedCount} data baru.`;
+            if (errorCount > 0) msg += ` (${errorCount} data dilewati karena duplikat/error).`;
+            
+            showToast(msg, "success");
+        } else {
+            showToast("Gagal mengimpor. Pastikan file berasal dari Ekspor Excel aplikasi ini.", "error");
+        }
+
+        // Reset input file agar bisa pilih file yang sama lagi jika perlu
+        input.value = '';
+    };
+    
+    // Baca file sebagai text (karena formatnya HTML tabel)
+    reader.readAsText(file);
+}
 
         // --- EXPORT TO EXCEL ---
-        function exportToExcel() {
-            if (db.length === 0) {
-                showToast("Tidak ada data untuk diekspor", "error");
-                return;
-            }
+		function exportToExcel() {
+    if (db.length === 0) {
+        showToast("Tidak ada data untuk diekspor", "error");
+        return;
+    }
 
-            const sortedDb = [...db].sort((a, b) => b.id - a.id);
+    const sortedDb = [...db].sort((a, b) => b.id - a.id);
 
-            let table = `<table border="1" style="border-collapse: collapse; width: 100%;">`;
-            table += `<tr><th colspan="10" style="text-align:center; font-size: 16px; font-weight: bold;">LAPORAN SETORAN</th></tr>`;
-            table += `<tr><th colspan="10" style="text-align:center;">${appSettings.instansi}</th></tr>`;
-            table += `<tr><td colspan="10" style="text-align:center;">Tanggal Export: ${new Date().toLocaleDateString('id-ID')}</td></tr>`;
-            table += `<tr><td colspan="10">&nbsp;</td></tr>`; 
+    let table = `<table border="1" style="border-collapse: collapse; width: 100%;">`;
+    table += `<tr><th colspan="11" style="text-align:center; font-size: 16px; font-weight: bold;">LAPORAN SETORAN</th></tr>`;
+    table += `<tr><th colspan="11" style="text-align:center;">${appSettings.instansi}</th></tr>`;
+    table += `<tr><td colspan="11" style="text-align:center;">Tanggal Export: ${new Date().toLocaleDateString('id-ID')}</td></tr>`;
+    table += `<tr><td colspan="11">&nbsp;</td></tr>`; 
 
-            table += `<thead>
-                <tr style="background-color: #f0f0f0;">
-                    <th>No. Kwitansi</th>
-                    <th>Periode</th>
-                    <th>Tgl Cetak</th>
-                    <th>Tgl Setor</th>
-                    <th>Penyetor</th>
-                    <th>Penerima</th>
-                    <th>OPD</th>
-                    <th>Total Bruto</th>
-                    <th>Total Bayar (50%)</th>
-                </tr>
-            </thead>`;
+    table += `<thead>
+        <tr style="background-color: #f0f0f0;">
+            <th>No. Kwitansi</th>
+            <th>Periode</th>
+            <th>Tgl Cetak</th>
+            <th>Tgl Setor</th>
+            <th>Penyetor</th>
+            <th>Penerima</th>
+            <th>OPD</th>
+            <th>Total Bruto</th>
+            <th>Total Bayar (50%)</th>
+            <!-- Header tersembunyi untuk data mentah -->
+            <th style="display:none;">Hidden Data</th>
+        </tr>
+    </thead>`;
 
-            table += "<tbody>";
-            sortedDb.forEach(item => {
-                const formattedNominal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal);
-                const formattedBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.totalBayar);
-                
-                table += `
-                    <tr>
-                        <td style="mso-number-format:'\@'">${item.noKwitansi}</td>
-                        <td>${item.bulan} ${item.tahun}</td>
-                        <td>${formatDateIndo(item.tglCetak)}</td>
-                        <td>${formatDateIndo(item.tglSetor)}</td>
-                        <td>${item.namaPenyetor}</td>
-                        <td>${item.penerima}</td>
-                        <td>${item.opd}</td>
-                        <td>${formattedNominal}</td>
-                        <td>${formattedBayar}</td>
-                    </tr>
-                `;
-            });
-            table += "</tbody></table>";
+    table += "<tbody>";
+    sortedDb.forEach(item => {
+        const formattedNominal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal);
+        const formattedBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.totalBayar);
+        
+        // Encode data mentah (JSON) agar bisa dibaca saat import
+        // encodeURIComponent penting agar karakter khusus tidak merusak HTML
+        const rawData = encodeURIComponent(JSON.stringify(item));
 
-            const blob = new Blob([table], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Laporan_Setoran_${new Date().toISOString().slice(0,10)}.xls`; 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        table += `
+            <tr>
+                <td style="mso-number-format:'\@'">${item.noKwitansi}</td>
+                <td>${item.bulan} ${item.tahun}</td>
+                <td>${formatDateIndo(item.tglCetak)}</td>
+                <td>${formatDateIndo(item.tglSetor)}</td>
+                <td>${item.namaPenyetor}</td>
+                <td>${item.penerima}</td>
+                <td>${item.opd}</td>
+                <td>${formattedNominal}</td>
+                <td>${formattedBayar}</td>
+                <!-- DATA MENTAH DISIMPAN DISINI (Tersembunyi) -->
+                <td class="hidden-raw-data" style="display:none;">${rawData}</td>
+            </tr>
+        `;
+    });
+    table += "</tbody></table>";
+
+    const blob = new Blob([table], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Laporan_Setoran_${new Date().toISOString().slice(0,10)}.xls`; 
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
 
         // --- PREVIEW & PRINT LOGIC ---
 
@@ -1135,4 +1651,3 @@
 </body>
 
 </html>
-
